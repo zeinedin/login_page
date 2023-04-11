@@ -6,22 +6,24 @@ const ejs = require('ejs');
 const mongoose = require('mongoose');
 const encrypt = require('mongoose-encryption');
 
-
 //usign dependencies
 const app = express();
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
+const PORT = process.env.PORT || 3000;
 
 //database connection
 const uri = process.env.DB_URL;
-mongoose.connect(process.env.DB_URL, { useNewUrlParser: true, useUnifiedTopology: true })
-.then(()=>{
-    console.log('Connected to database');
-})
-.catch((err)=>{
-    console.log(err);
-})
+
+const connectDB = async () => {
+    try {
+        await mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+        console.log('Connected to database');
+    } catch (err) {
+        console.log(err);
+    }
+}
 
 //Schema mongodb and model
 const userSchema = new mongoose.Schema({
@@ -83,6 +85,8 @@ app.post('/login', (req, res) => {
 })
 
 //Server listening on port 3000
-app.listen(3000, () => {
-console.log('Server is running on port 3000');
+connectDB().then(() => {
+    app.listen(PORT, () => {
+        console.log('Server is running on port 3000');
+        })
 })
